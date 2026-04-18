@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#FF8C00">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Caldeira Checklist">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/assets/logo.png">
+    <link rel="apple-touch-icon" href="/assets/logo.png">
+    <title>Caldeira - Check-list Caminhões</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #FF8C00;
+            --secondary: #1E3A5F;
+            --accent: #4A90E2;
+            --success: #27AE60;
+            --warning: #F39C12;
+            --danger: #E74C3C;
+        }
+
+        * {
+            --tw-ring-color: var(--primary);
+        }
+
+        .gradient-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, #E67E00 100%);
+        }
+
+        .gradient-secondary {
+            background: linear-gradient(135deg, var(--secondary) 0%, #142542 100%);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #E67E00;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 140, 0, 0.3);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .card-shadow {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .checkbox-custom {
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .checkbox-custom:checked {
+            background-color: var(--success);
+            border-color: var(--success);
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='white'%3e%3cpath fill-rule='evenodd' d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z' clip-rule='evenodd'/%3e%3c/svg%3e");
+            background-size: 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .container-safe {
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+        }
+
+        .smooth-scroll {
+            scroll-behavior: smooth;
+        }
+
+        @media (max-width: 768px) {
+            .btn-text-responsive {
+                font-size: 14px;
+                padding: 10px 16px;
+            }
+        }
+
+        .alert-maintenance {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .loading-spinner {
+            border: 3px solid rgba(255, 140, 0, 0.1);
+            border-radius: 50%;
+            border-top: 3px solid var(--primary);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans smooth-scroll container-safe">
+
+    <!-- LOGIN SCREEN -->
+    <div id="loginScreen" class="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800">
+        <div class="w-full h-full max-w-md flex flex-col items-center justify-center px-4 py-6">
+            <!-- Logo -->
+            <div class="mb-8 text-center">
+                <img src="assets/logo.png" alt="Caldeira Transportadora" class="w-32 h-32 object-contain mx-auto mb-4">
+                <h1 class="text-3xl font-bold text-white mb-2">Caldeira</h1>
+                <p class="text-gray-300 text-sm">Sistema de Check-list Caminhões</p>
+            </div>
+
+            <!-- Login Form -->
+            <div class="w-full bg-white rounded-2xl card-shadow p-6">
+                <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Acesso</h2>
+
+                <div class="mb-5">
+                    <label class="block text-gray-700 font-semibold mb-2">
+                        <i class="fas fa-user text-primary mr-2"></i>Apelido
+                    </label>
+                    <input type="text" id="loginNickname" placeholder="Digite seu apelido" 
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition">
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-gray-700 font-semibold mb-2">
+                        <i class="fas fa-lock text-primary mr-2"></i>Senha
+                    </label>
+                    <input type="password" id="loginPassword" placeholder="Digite sua senha" 
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition">
+                </div>
+
+                <button onclick="handleLogin()" class="w-full btn-primary text-white font-bold py-3 rounded-lg btn-text-responsive flex items-center justify-center gap-2">
+                    <i class="fas fa-sign-in-alt"></i> Entrar
+                </button>
+
+                <p class="text-center text-gray-500 text-xs mt-4">
+                    Demo: admin / admin123
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div id="mainApp" class="hidden w-full bg-gray-50">
+        <!-- Header -->
+        <header class="sticky top-0 z-40 w-full bg-white border-b border-gray-200 card-shadow">
+            <div class="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <img src="assets/logo.png" alt="Caldeira" class="w-10 h-10">
+                    <div>
+                        <h1 class="font-bold text-gray-800">Caldeira</h1>
+                        <p class="text-xs text-gray-500" id="userDisplay">Conectado</p>
+                    </div>
+                </div>
+                <button onclick="handleLogout()" class="text-gray-600 hover:text-gray-800 transition" title="Sair">
+                    <i class="fas fa-sign-out-alt text-lg"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="max-w-2xl mx-auto px-4 py-4 pb-24">
+
+            <!-- ALERT MANUTENÇÃO -->
+            <div id="maintenanceAlert" class="hidden mb-4 p-4 bg-red-50 border border-red-200 rounded-lg alert-maintenance">
+                <div class="flex items-start gap-3">
+                    <i class="fas fa-exclamation-triangle text-red-600 text-xl mt-1"></i>
+                    <div>
+                        <h3 class="font-bold text-red-800">⚠️ Manutenção Necessária!</h3>
+                        <p id="maintenanceMessage" class="text-sm text-red-700 mt-1"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabs Navigation -->
+            <div class="flex gap-2 mb-6 border-b border-gray-200">
+                <button onclick="switchTab('info')" class="tab-btn active pb-3 px-4 font-semibold text-primary border-b-2 border-primary transition">
+                    <i class="fas fa-info-circle mr-2"></i>Informações
+                </button>
+                <button onclick="switchTab('checklist')" class="tab-btn pb-3 px-4 font-semibold text-gray-600 border-b-2 border-transparent hover:text-primary transition">
+                    <i class="fas fa-list-check mr-2"></i>Check-list
+                </button>
+                <button onclick="switchTab('fotos')" class="tab-btn pb-3 px-4 font-semibold text-gray-600 border-b-2 border-transparent hover:text-primary transition">
+                    <i class="fas fa-camera mr-2"></i>Fotos
+                </button>
+            </div>
+
+            <!-- TAB 1: INFORMAÇÕES -->
+            <div id="infoTab" class="tab-content">
+                <div class="space-y-4">
+                    <!-- Placa -->
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">
+                            <i class="fas fa-car text-primary mr-2"></i>Placa do Caminhão
+                        </label>
+                        <input type="text" id="infoPlaca" placeholder="ex: ABC-1234" maxlength="8"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none transition uppercase">
+                    </div>
+
+                    <!-- KM -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">
+                                <i class="fas fa-tachometer-alt text-primary mr-2"></i>KM Atual
+                            </label>
+                            <input type="number" id="infoKm" placeholder="0" min="0" step="1"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none transition"
+                                oninput="verificarManutencao()">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">
+                                <i class="fas fa-wrench text-warning mr-2"></i>Próxima Manutençã
+                            </label>
+                            <input type="number" id="infoProximaManutencao" placeholder="-" disabled
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-100 text-gray-600">
+                        </div>
+                    </div>
+
+                    <!-- Motorista -->
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">
+                            <i class="fas fa-user text-primary mr-2"></i>Nome do Motorista
+                        </label>
+                        <input type="text" id="infoMotorista" placeholder="Digite o nome do motorista"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none transition">
+                    </div>
+
+                    <!-- Data Hora -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">
+                                <i class="fas fa-calendar text-primary mr-2"></i>Data
+                            </label>
+                            <input type="date" id="infoData"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none transition">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">
+                                <i class="fas fa-clock text-primary mr-2"></i>Hora
+                            </label>
+                            <input type="time" id="infoHora"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none transition">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: CHECK-LIST -->
+            <div id="checklistTab" class="tab-content hidden">
+                <div id="checklistItems" class="space-y-3">
+                    <!-- Items será inserido aqui via JS -->
+                </div>
+                <button onclick="adicionarItemChecklist()" class="w-full mt-6 border-2 border-dashed border-gray-300 rounded-lg py-3 text-gray-600 hover:border-primary hover:text-primary transition font-semibold">
+                    <i class="fas fa-plus mr-2"></i>Adicionar Item
+                </button>
+            </div>
+
+            <!-- TAB 3: FOTOS -->
+            <div id="fotosTab" class="tab-content hidden">
+                <div class="space-y-4">
+                    <!-- Camera Input -->
+                    <div class="border-2 border-dashed border-primary rounded-lg p-6 text-center">
+                        <input type="file" id="cameraInput" accept="image/*" capture="environment" class="hidden" onchange="handlePhotoCapture(event)">
+                        <button onclick="document.getElementById('cameraInput').click()" class="flex flex-col items-center gap-3 w-full">
+                            <i class="fas fa-camera text-4xl text-primary"></i>
+                            <span class="font-semibold text-gray-700">Tirar Foto</span>
+                            <span class="text-xs text-gray-500">Toque para usar câmera</span>
+                        </button>
+                    </div>
+
+                    <!-- Photos Grid -->
+                    <div id="photosGrid" class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        <!-- Fotos será inseridas aqui -->
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Bottom Action Bar -->
+        <footer class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 flex gap-2 max-w-2xl mx-auto">
+            <button onclick="resetChecklist()" class="flex-1 py-3 px-4 border-2 border-gray-300 text-gray-700 font-bold rounded-lg hover:bg-gray-50 transition">
+                <i class="fas fa-redo mr-2"></i>Resetar
+            </button>
+            <button onclick="finalizarChecklist()" class="flex-1 py-3 px-4 btn-primary text-white font-bold rounded-lg btn-text-responsive flex items-center justify-center gap-2">
+                <i class="fas fa-check-double"></i>Finalizar
+            </button>
+        </footer>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loadingIndicator" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 flex flex-col items-center gap-4">
+            <div class="loading-spinner w-12 h-12"></div>
+            <p class="text-gray-700 font-semibold">Processando...</p>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toastNotification" class="fixed bottom-24 left-4 right-4 bg-green-500 text-white px-4 py-3 rounded-lg shadow-lg hidden z-50 max-w-sm">
+        <p id="toastMessage"></p>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

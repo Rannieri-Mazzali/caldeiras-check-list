@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes do Check-list</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #FF8C00;
+            --secondary: #1E3A5F;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background-color: #E67E00;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen max-w-2xl mx-auto">
+        <!-- Header -->
+        <header class="sticky top-0 bg-white border-b border-gray-200 shadow-sm">
+            <div class="px-4 py-4 flex items-center gap-3">
+                <button onclick="window.history.back()" class="text-primary hover:text-primary/80">
+                    <i class="fas fa-chevron-left text-xl"></i>
+                </button>
+                <div>
+                    <h1 class="font-bold text-gray-800">Detalhes do Check-list</h1>
+                    <p class="text-xs text-gray-500" id="checklistId">ID: -</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content -->
+        <main class="p-4 pb-24">
+            <div id="content" class="space-y-4">
+                <div class="bg-white rounded-lg shadow p-4">
+                    <p class="text-center text-gray-500">
+                        <i class="fas fa-spinner fa-spin"></i> Carregando...
+                    </p>
+                </div>
+            </div>
+        </main>
+
+        <!-- Action Bar -->
+        <footer class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 max-w-2xl mx-auto">
+            <div class="flex gap-2">
+                <button onclick="window.print()" class="flex-1 btn-primary text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2">
+                    <i class="fas fa-print"></i>Imprimir
+                </button>
+                <button onclick="compartilharWhatsApp()" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2">
+                    <i class="fab fa-whatsapp"></i>Compartilhar
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        let checklistData = null;
+
+        async function loadChecklist() {
+            const checklistId = new URLSearchParams(window.location.search).get('id');
+            
+            if (!checklistId) {
+                document.getElementById('content').innerHTML = `
+                    <div class="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
+                        <i class="fas fa-exclamation-circle text-red-500 text-2xl mb-2"></i>
+                        <p class="text-red-700 font-semibold">Check-list não encontrado</p>
+                    </div>
+                `;
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/checklist/${checklistId}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    checklistData = data.checklist;
+                    renderChecklist(data.checklist);
+                } else {
+                    throw new Error('Check-list não encontrado');
+                }
+            } catch (error) {
+                document.getElementById('content').innerHTML = `
+                    <div class="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
+                        <i class="fas fa-exclamation-circle text-red-500 text-2xl mb-2"></i>
+                        <p class="text-red-700 font-semibold">${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function renderChecklist(checklist) {
+            const dataHora = new Date(checklist.dataHora).toLocaleString('pt-BR');
+            const checklistId = new URLSearchParams(window.location.search).get('id');
+            
+            document.getElementById('checklistId').textContent = `ID: ${checklistId}`;
+
+            let html = `
+                <!-- Informações do Veículo -->
+                <div class="bg-white rounded-lg shadow-sm p-4 space-y-3">
+                    <h2 class="font-bold text-lg text-gray-800 border-b pb-2">
+                        <i class="fas fa-truck text-primary mr-2"></i>Informações do Caminhão
+                    </h2>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <p class="text-xs text-gray-500 font-semibold">PLACA</p>
+                            <p class="text-lg font-bold text-gray-800">${checklist.placa}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500 font-semibold">KM</p>
+                            <p class="text-lg font-bold text-gray-800">${checklist.km.toLocaleString('pt-BR')}</p>
+                        </div>
+                        <div class="col-span-2">
+                            <p class="text-xs text-gray-500 font-semibold">MOTORISTA</p>
+                            <p class="text-lg font-bold text-gray-800">${checklist.motorista}</p>
+                        </div>
+                        <div class="col-span-2">
+                            <p class="text-xs text-gray-500 font-semibold">DATA/HORA</p>
+                            <p class="text-sm text-gray-700">${dataHora}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Items do Check-list -->
+                <div class="bg-white rounded-lg shadow-sm p-4">
+                    <h2 class="font-bold text-lg text-gray-800 border-b pb-2 mb-4">
+                        <i class="fas fa-list-check text-primary mr-2"></i>Itens do Check-list
+                    </h2>
+                    <div class="space-y-2">
+            `;
+
+            checklist.items.forEach((item, index) => {
+                const statusIcon = item.conforme ? 
+                    '<i class="fas fa-check-circle text-green-500"></i>' : 
+                    '<i class="fas fa-times-circle text-red-500"></i>';
+                const statusText = item.conforme ? 'Conforme' : 'Não Conforme';
+                const statusColor = item.conforme ? 'bg-green-50' : 'bg-red-50';
+
+                html += `
+                    <div class="${statusColor} p-3 rounded-lg border ${item.conforme ? 'border-green-200' : 'border-red-200'}">
+                        <div class="flex items-start gap-2">
+                            <div class="mt-1">${statusIcon}</div>
+                            <div class="flex-1">
+                                <p class="font-semibold text-gray-800">${item.name}</p>
+                                <p class="text-xs text-gray-600 mt-1">${statusText}</p>
+                                ${item.obs ? `<p class="text-sm text-gray-700 mt-2"><i class="fas fa-note-sticky text-primary"></i> ${item.obs}</p>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `
+                    </div>
+                </div>
+            `;
+
+            // Status do Check-list
+            const statusColor = checklist.status === 'finalizado' ? 'bg-green-50' : 'bg-yellow-50';
+            const statusBg = checklist.status === 'finalizado' ? 'border-green-200' : 'border-yellow-200';
+            
+            html += `
+                <div class="${statusColor} border ${statusBg} rounded-lg p-4 text-center">
+                    <i class="fas fa-check-circle text-green-500 text-2xl mb-2"></i>
+                    <p class="text-green-700 font-semibold">Check-list Finalizado</p>
+                    <p class="text-xs text-green-600 mt-1">Enviado para análise</p>
+                </div>
+            `;
+
+            document.getElementById('content').innerHTML = html;
+        }
+
+        function compartilharWhatsApp() {
+            if (!checklistData) return;
+
+            const mensagem = `
+📋 CHECK-LIST CALDEIRA TRANSPORTADORA
+
+🚚 Placa: ${checklistData.placa}
+⏰ KM: ${checklistData.km}
+👤 Motorista: ${checklistData.motorista}
+
+✅ Itens Conformes: ${checklistData.items.filter(i => i.conforme).length}/${checklistData.items.length}
+
+🔗 Veja detalhes completos no sistema
+            `;
+
+            const url = `https://api.whatsapp.com/send?phone=5516992091408&text=${encodeURIComponent(mensagem.trim())}`;
+            window.open(url, '_blank');
+        }
+
+        window.addEventListener('DOMContentLoaded', loadChecklist);
+    </script>
+</body>
+</html>
