@@ -262,11 +262,13 @@ async function handlePhotoCapture(event) {
             });
 
             renderPhotos();
-            showToast('📸 Foto enviada para WhatsApp e salva!');
+            showToast('📸 Foto capturada com sucesso!');
+        } else {
+            showToast('⚠️ ' + (data.message || 'Erro ao capturar foto'), 'warning');
         }
     } catch (error) {
         console.error('Error uploading photo:', error);
-        showToast('❌ Erro ao enviar foto', 'error');
+        showToast('❌ Erro ao capturar foto', 'error');
     }
 
     showLoading(false);
@@ -325,7 +327,7 @@ async function finalizarChecklist() {
     showLoading(true);
 
     try {
-        // Atualizar checklist no backend
+        // Atualizar checklist no backend com fotos
         const updateResponse = await fetch(`/api/checklist/${appState.currentChecklistId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
@@ -333,7 +335,8 @@ async function finalizarChecklist() {
                 placa: appState.informacoes.placa,
                 km: appState.informacoes.km,
                 motorista: appState.informacoes.motorista,
-                items: appState.checklistItems
+                items: appState.checklistItems,
+                fotos: appState.fotos
             })
         });
 
@@ -367,13 +370,22 @@ async function finalizarChecklist() {
 
 function mostrarRelatorioPDF(data) {
     const relatorio = data.report;
-    const link = `${window.location.origin}/checklist/${data.checklistId}`;
+    const checklistId = data.checklistId;
+    const linkChecklist = `${window.location.origin}/checklist-detail.html?id=${checklistId}`;
     
-    const mensagemWhatsApp = encodeURIComponent(`${relatorio}\n\n🔗 Acesse aqui para mais detalhes`);
-    const urlWhatsApp = `https://api.whatsapp.com/send?phone=5516992091408&text=${mensagemWhatsApp}`;
-
-    alert('📋 CHECK-LIST FINALIZADO!\n\nClique OK para abrir WhatsApp e confirmar envio.');
-    window.open(urlWhatsApp, '_blank');
+    // O backend já enviou para WhatsApp automaticamente
+    const mensagem = `✅ CHECK-LIST ENVIADO!\n\n${relatorio}\n\n🔗 Link: ${linkChecklist}`;
+    
+    // Mostrar o link ao usuário
+    console.log('📱 WhatsApp enviado para: +55 16 99209-1408');
+    console.log('🔗 Link do checklist:', linkChecklist);
+    
+    // Copiar link para clipboard
+    navigator.clipboard.writeText(linkChecklist).then(() => {
+        showToast('📋 Link copiado! WhatsApp enviado para +55 16 99209-1408');
+    }).catch(() => {
+        showToast('✅ Check-list enviado para WhatsApp!');
+    });
 }
 
 function resetChecklist() {

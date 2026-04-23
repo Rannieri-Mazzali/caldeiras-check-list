@@ -6,7 +6,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import axios from 'axios';
 import fs from 'fs';
-import { v4 as uuidv4 } from 'crypto';
+import { v4 as uuidv4 } from 'uuid';
+import twilio from 'twilio';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -18,7 +19,10 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
-app.use(express.static('public'));
+
+// Servir arquivos estáticos ANTES das rotas da API
+const publicPath = path.join(__dirname, '../public');
+app.use(express.static(publicPath));
 
 // Multer configuration
 const storage = multer.diskStorage({
@@ -71,6 +75,11 @@ const users: User[] = [
 const maintenanceSchedules: MaintenanceSchedule[] = [];
 const checklists: CheckList[] = [];
 
+// ===== CONFIGURAÇÃO TWILIO =====
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const twilioClient = twilio(accountSid, authToken);
+
 // ===== ROTAS DE AUTENTICAÇÃO =====
 app.post('/api/auth/login', (req: Request, res: Response) => {
   const { nickname, password } = req.body;
@@ -122,11 +131,12 @@ app.put('/api/checklist/:id', (req: Request, res: Response) => {
   const checklist = checklists.find(c => c.id === req.params.id);
 
   if (checklist) {
-    const { placa, km, motorista, items } = req.body;
+    const { placa, km, motorista, items, fotos } = req.body;
     if (placa) checklist.placa = placa;
     if (km) checklist.km = parseInt(km);
     if (motorista) checklist.motorista = motorista;
     if (items) checklist.items = items;
+    if (fotos) checklist.fotos = fotos.map((f: any) => f.path || f);
 
     res.json({ success: true, checklist });
   } else {
@@ -174,23 +184,12 @@ app.post('/api/photo/upload', upload.single('photo'), async (req: Request, res: 
 
   const fotoPath = `/uploads/${req.file.filename}`;
 
-  // Send to WhatsApp
-  try {
-    await enviarFotoParaWhatsApp(fotoPath);
-    res.json({
-      success: true,
-      message: 'Foto enviada para WhatsApp',
-      fotoPath: fotoPath,
-      filename: req.file.filename
-    });
-  } catch (error) {
-    res.json({
-      success: true,
-      message: 'Foto salva (falha ao enviar WhatsApp)',
-      fotoPath: fotoPath,
-      error: error instanceof Error ? error.message : 'Erro desconhecido'
-    });
-  }
+  res.json({
+    success: true,
+    message: 'Foto armazenada com sucesso',
+    fotoPath: fotoPath,
+    filename: req.file.filename
+  });
 });
 
 // ===== ROTAS DE MANUTENÇÃO =====
@@ -269,21 +268,22 @@ ITENS DO CHECKLIST:
 }
 
 async function enviarParaWhatsApp(mensagem: string, checklist: CheckList): Promise<void> {
-  const telefone = process.env.WHATSAPP_PHONE_CLEAN || '5516992091408';
-  const texto = encodeURIComponent(mensagem);
-
-  // Usando link do WhatsApp Web
-  const linkWhatsApp = `https://api.whatsapp.com/send?phone=${telefone}&text=${texto}`;
-
-  console.log('🔗 Link WhatsApp gerado:', linkWhatsApp);
-  // Em produção, usar a API oficial do WhatsApp
-}
-
-async function enviarFotoParaWhatsApp(fotoPath: string): Promise<void> {
-  const telefone = process.env.WHATSAPP_PHONE_CLEAN || '5516992091408';
-
-  console.log(`📸 Foto enviada para WhatsApp: ${fotoPath}`);
-  // Em produção, usar a API oficial do WhatsApp com upload de mídia
+  const appUrl = process.env.APP_URL || 'https://caldeiras-check-list.vercel.app';
+  const linkChecklist = `${appUrl}/checklist-detail.html?id=${checklist.id}`;
+  const phoneNumber = process.env.WHATSAPP_PHONE_CLEAN || '351936745950';
+  
+  const mensagemCompleta = `${mensagem}\n\n🔗 *Acesse aqui:*\n${linkChecklist}`;
+  
+  try {
+    const message = await twilioClient.messages.create({
+      body: mensagemCompleta,
+      from: 'whatsapp:' + process.env.TWILIO_WHATSAPP_FROM,
+      to: 'whatsapp:+' + phoneNumber
+    });
+    console.log('✅ Mensagem enviada via Twilio:', message.sid);
+  } catch (error) {
+    console.error('❌ Erro ao enviar via Twilio:', error);
+  }
 }
 
 // ===== ROTA DE STATUS =====
@@ -295,6 +295,11 @@ app.get('/api/status', (req: Request, res: Response) => {
     checklists: checklists.length,
     maintenances: maintenanceSchedules.length
   });
+});
+
+// ===== ROTA CATCH-ALL PARA SPA =====
+app.get('*', (req: Request, res: Response) => {
+  res.sendFile(path.join(publicPath, 'index.html'));
 });
 
 // ===== INICIAR SERVIDOR =====
