@@ -1,4 +1,4 @@
-/*
+
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 
@@ -8,17 +8,17 @@ const TechnologySection: React.FC = () => {
   const technologies = [
     {
       id: 0,
-      title: "Mobile App",
+      title: "Web App",
       icon: "📱",
       description:
-        "Aplicativo nativo para iOS e Android com sincronização em tempo real",
+        "Aplicativo web iOS e Android com sincronização em tempo real",
       features: ["Offline-first", "Sincronização automática", "Notificações push"],
     },
     {
       id: 1,
       title: "Dashboard",
       icon: "📊",
-      description: "Painel intuitivo com métricas, gráficos e relatórios",
+      description: "Painel ajustavel e personalizável para gestores",
       features: ["Análise em tempo real", "Exportar relatórios", "Customizável"],
     },
     {
@@ -30,10 +30,10 @@ const TechnologySection: React.FC = () => {
     },
     {
       id: 3,
-      title: "3D Visualization",
-      icon: "🎮",
-      description: "Visualize sua frota em tempo real com tecnologia 3D",
-      features: ["Raio-X de veículos", "Monitoramento GPS", "Alertas em mapa"],
+      title: "Visualization",
+      icon: "",
+      description: "Visualize sua frota",
+      features: ["preventiva de veículos", "Monitoramento check-list", "Alertas visuais"],
     },
   ];
 
@@ -43,7 +43,7 @@ const TechnologySection: React.FC = () => {
       className="py-20 md:py-32 px-4 md:px-8 bg-gradient-to-b from-caldeira-900 via-iron-900 to-caldeira-950"
     >
       <div className="container mx-auto max-w-6xl">
-        {/* Header */ /*} 
+        {/* Header */} 
         <div className="text-center mb-16 md:mb-24">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
             Tecnologia <span className="gradient-text-caldeira">Avançada</span>
@@ -55,9 +55,9 @@ const TechnologySection: React.FC = () => {
 
        
 
-        {/* Feature Tabs */ /*}
+        {/* Feature Tabs */ }
         <div className="bg-gradient-to-br from-caldeira-800/50 to-iron-800/50 rounded-xl p-8 md:p-12">
-          {/* Tab Buttons */ /* }
+          {/* Tab Buttons */  }
           <div className="flex flex-wrap gap-3 md:gap-4 mb-8">
             {technologies.map((tech) => (
               <button
@@ -75,7 +75,7 @@ const TechnologySection: React.FC = () => {
             ))}
           </div>
 
-          {/* Tab Content */ /*}
+          {/* Tab Content */ }
           <motion.div
             key={activeTab}
             initial={{ opacity: 0, y: 10 }}

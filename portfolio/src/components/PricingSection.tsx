@@ -11,7 +11,7 @@ const PricingSection: React.FC = () => {
         {/* Header */}
         <div className="text-center mb-16 md:mb-24 animate-slide-in-right">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            Planos de <span className="gradient-text-caldeira">Preço</span>
+            Planos <span className="gradient-text-caldeira"></span>
           </h2>
           <p className="text-lg md:text-xl text-caldeira-300 max-w-2xl mx-auto">
             Escolha o plano perfeito para sua frota

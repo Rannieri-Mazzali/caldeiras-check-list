@@ -19,7 +19,9 @@
       "default",
       {
         "ignore": [
-          "-moz-appearance"
+          "-moz-appearance",
+          "-webkit-text-size-adjust",
+          "backdrop-filter"
         ]
       }
     ],
