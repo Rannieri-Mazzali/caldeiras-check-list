@@ -1,0 +1,129 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-gradient-to-b from-caldeira-950 via-iron-900 to-caldeira-900;
+  color: #e8e6e0;
+  font-family: "Georgia", "Garamond", serif;
+}
+
+/* Scrollbar customizado */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-caldeira-900;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-caldeira-600 rounded-lg hover:bg-caldeira-500;
+}
+
+/* Animações customizadas */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(184, 145, 92, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(184, 145, 92, 0.8);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.8s ease-out;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.8s ease-out;
+}
+
+/* Botões customizados */
+.btn-primary {
+  @apply px-8 py-3 bg-gradient-caldeira text-white font-bold rounded-lg transition-all duration-300 hover:shadow-lg hover:scale-105 active:scale-95;
+}
+
+.btn-secondary {
+  @apply px-8 py-3 bg-transparent border-2 border-caldeira-600 text-caldeira-300 font-bold rounded-lg transition-all duration-300 hover:bg-caldeira-600 hover:text-white active:scale-95;
+}
+
+/* Cards customizados */
+.card-premium {
+  @apply relative bg-gradient-to-br from-caldeira-800 to-caldeira-900 border border-caldeira-600 rounded-xl p-6 shadow-lg transition-all duration-300 hover:shadow-2xl hover:border-caldeira-500;
+}
+
+.card-dark {
+  @apply bg-iron-800 border border-iron-700 rounded-lg p-6 transition-all duration-300 hover:border-caldeira-600;
+}
+
+/* Text gradients */
+.gradient-text-caldeira {
+  @apply bg-gradient-to-r from-caldeira-300 via-caldeira-500 to-caldeira-300 bg-clip-text text-transparent;
+}
+
+/* Hero section */
+.hero-content {
+  @apply relative z-10 flex flex-col items-center justify-center min-h-screen px-4 md:px-8;
+}
+
+/* Seções */
+section {
+  @apply scroll-mt-20;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+  }
+}
