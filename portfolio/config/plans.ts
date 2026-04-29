@@ -8,18 +8,45 @@
 export const PLANS_CONFIG = {
   currency: "R$",
   currencySymbol: "R$",
-  billingPeriod: "/mês",
+  billingPeriod: "/Suporte e continuedade operacional mensal",
 
   plans: [
-     
+    
+    
+    {
+      id: "premiun",
+      name: "Plano Premium",
+      description: "Para frotas com necessidades avançadas e alto volume de veículos",
+      monthlyPrice:1600, // EDITE AQUI - preço mensal
+      setupPrice:14000, // EDITE AQUI - preço de setup/instalação
+      features: [
+
+        "Cadastro de veículos e motoristas",
+        "Check-lists digitais",
+        "Alertas de manutenção preventiva",
+        "Relatórios básicos de auditoria",
+        "Economia com manutenção preventiva",
+        "Facilidade de gestão e auditoria de checklists",
+        "Histórico completo e confiável",
+        "Mais segurança na liberação dos veículos",
+        "Aumenta controle da frota",
+        "Suporte completo",
+        "Reduz falhas operacionais",
+        "Elimina controles em papel e caderno",
+      ],
+      highlight: false,
+      color: "from-caldeira-600 to-caldeira-700",
+    },
+
     {
       id: "start",
       name: "Plano Start",
       description: "Para frotas em crescimento com necessidades intermediárias",
-      monthlyPrice: 1200, // EDITE AQUI - preço mensal
+      monthlyPrice: 1000, // EDITE AQUI - preço mensal
       setupPrice: 9500, // EDITE AQUI - preço de setup/instalação
       features: [
-         "Economia com manutenção preventiva",
+
+        "Economia com manutenção preventiva",
         "Facilidade de gestão e auditoria de checklists",
         "Histórico completo e confiável",
         "Mais segurança na liberação dos veículos",

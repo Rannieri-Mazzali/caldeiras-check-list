@@ -61,7 +61,7 @@ const PricingSection: React.FC = () => {
                   {plan.setupPrice > 0 && (
                     <p className="text-sm text-caldeira-300 mt-2">
                       + {PLANS_CONFIG.currency}
-                      {plan.setupPrice.toLocaleString("pt-BR")} de instalação
+                      {plan.setupPrice.toLocaleString("pt-BR")} de implatação do sistema de gestão de check-list da frotas
                     </p>
                   )}
                 </div>
